@@ -1,57 +1,55 @@
-/**
- * Robot que recorre la ruta. Acumula ganancias y se dibuja como un círculo rojo.
- */
 public class Robot {
     private final int initialLocation;
     private int location;
-    private int profit;
-    private Circle view;
+    private int moved;
+    private int collected;
 
-    /**
-     * Crea un robot en la posición dada.
-     * @param location posición inicial.
-     */
+    private Circle view;
+    private boolean visible = false;
+
     public Robot(int location){
-        this.location = location;
         this.initialLocation = location;
+        this.location = location;
     }
 
-    /** @return posición actual del robot. */
     public int location(){ return location; }
+    public int profit(){ return collected - moved; }
 
-    /** @return ganancia acumulada del robot. */
-    public int profit(){ return profit; }
+    public void addSteps(int meters){ moved += Math.abs(meters); }
+    public void addCollected(int amount){ if(amount > 0) collected += amount; }
 
-    /** Suma a la ganancia acumulada. */
-    public void addProfit(int v){ profit += v; }
+    public void reset(){
+        location = initialLocation;
+        moved = 0;
+        collected = 0;
+        if(view != null){
+            int[] c = new Location(location).toXY();
+            view.moveTo(c[0]-6, c[1]-6);
+        }
+    }
 
-    /** Vuelve a la posición inicial y pone ganancias en cero. */
-    public void reset(){ location = initialLocation; profit = 0; }
-
-    /**
-     * Cambia la posición del robot y actualiza el dibujo.
-     * @param newLoc nueva ubicación lógica.
-     */
     public void moveTo(int newLoc){
         location = newLoc;
         if(view != null){
-            int[] xy = new Location(location).toXY();
-            view.moveTo(xy[0] - 7, xy[1] - 7);
+            int[] c = new Location(location).toXY();
+            view.moveTo(c[0]-6, c[1]-6);
         }
     }
 
-    /** Muestra el robot en pantalla (círculo rojo). */
     public void makeVisible(){
         if(view == null){
             view = new Circle();
-            view.changeSize(14);
+            view.changeSize(12);
             view.changeColor("red");
         }
-        int[] xy = new Location(location).toXY();
-        view.moveTo(xy[0] - 7, xy[1] - 7);
+        int[] c = new Location(location).toXY();
+        view.moveTo(c[0]-6, c[1]-6);
         view.makeVisible();
+        visible = true;
     }
 
-    /** Oculta el robot. */
-    public void makeInvisible(){ if(view != null) view.makeInvisible(); }
+    public void makeInvisible(){
+        if(view != null && visible) view.makeInvisible();
+        visible = false;
+    }
 }
