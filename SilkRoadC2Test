@@ -1,0 +1,175 @@
+import static org.junit.Assert.*;
+import org.junit.Test;
+
+public class SilkRoadC2Test {
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorLengthNegativoLanza() {
+        new SilkRoad(-1);
+    }
+
+    @Test
+    public void testCrearRobotProfitCero() {
+        SilkRoad road = new SilkRoad(20);
+        road.placeRobot(5);
+        assertEquals(0, rp(road, 5));
+        assertTrue(road.ok());
+    }
+
+    @Test
+    public void testCrearStoreValida() {
+        SilkRoad road = new SilkRoad(20);
+        road.placeStore(10, 15);
+        assertEquals(15, st(road, 10));
+        assertTrue(road.ok());
+    }
+
+    @Test
+    public void testRobotPosicionNegativaNoValida() {
+        SilkRoad road = new SilkRoad(20);
+        road.placeRobot(-2);
+        assertFalse(road.ok());
+    }
+
+    @Test
+    public void testStorePosicionNegativaNoValida() {
+        SilkRoad road = new SilkRoad(20);
+        road.placeStore(-2, 10);
+        assertFalse(road.ok());
+    }
+
+    @Test
+    public void testStoreSinTenguesNegativosRechazada() {
+        SilkRoad road = new SilkRoad(20);
+        road.placeStore(5, -10);
+        assertFalse(road.ok());
+        assertEquals(-1, st(road, 5));
+    }
+
+    @Test
+    public void testMoveRobotCobraDistanciaYRecolecta() {
+        SilkRoad road = new SilkRoad(60);
+        road.placeRobot(20);
+        road.placeStore(15, 15);  
+        road.moveRobot(20, -5);
+        assertEquals(10, rp(road, 15));
+        assertEquals(10, road.profit());
+        assertEquals(0, st(road, 15)); 
+        assertTrue(road.ok());
+    }
+
+    @Test
+    public void testRemoveRobotLimpiaGanancia() {
+        SilkRoad road = new SilkRoad(40);
+        road.placeRobot(20);
+        road.placeStore(15, 15);
+        road.moveRobot(20, -5); 
+        assertEquals(10, road.profit());
+        road.removeRobot(15);
+        assertEquals(0, road.profit());
+        assertTrue(road.ok());
+    }
+    
+    @Test
+    public void testRemoveStore() {
+        SilkRoad road = new SilkRoad(30);
+        road.placeStore(10, 25);
+        assertEquals(25, road.getStoreTengesAt(10)); 
+        road.removeStore(10);
+        assertEquals(-1, road.getStoreTengesAt(10));
+        assertTrue(road.ok());
+    }
+
+    
+    @Test
+    public void testResupplyStoresRestauraTengues() {
+        SilkRoad road = new SilkRoad(40);
+        road.placeStore(10, 12);
+        road.placeRobot(9);
+        road.moveRobot(9, 1); 
+        assertEquals(0, st(road, 10));
+        road.resupplyStores();
+        assertEquals(12, st(road, 10));
+        assertTrue(road.ok());
+    }
+
+    @Test
+    public void testReturnRobotsReseteaGananciaYPosicionLogica() {
+        SilkRoad road = new SilkRoad(40);
+        road.placeRobot(5);
+        road.placeStore(7, 5); 
+        road.moveRobot(5, 2);
+        assertEquals(3, rp(road, 7));
+        road.returnRobots();
+        assertEquals(0, rp(road, 5));
+        assertTrue(road.ok());
+    }
+
+    @Test
+    public void testRebootReseteaRobotsYStores() {
+        SilkRoad road = new SilkRoad(40);
+        road.placeStore(5, 10);
+        road.placeRobot(2);
+        road.moveRobot(2, 3); 
+        road.reboot();
+        assertEquals(10, st(road, 5));
+        assertEquals(0, rp(road, 2));
+        assertTrue(road.ok());
+    }
+
+    @Test
+    public void testRobotNoSeSaleDelRango() {
+        SilkRoad road = new SilkRoad(20);
+        road.placeRobot(19);
+        road.moveRobot(19, 1); 
+        assertFalse(road.ok());
+    }
+
+    @Test
+    public void testStoreNoFueraDelRango() {
+        SilkRoad road = new SilkRoad(20);
+        road.placeStore(30, 5);
+        assertFalse(road.ok());
+    }
+
+    @Test
+    public void testProfitSumaVariosRobots() {
+        SilkRoad road = new SilkRoad(100);
+        road.placeRobot(20);
+        road.placeRobot(50);
+        road.placeStore(15, 15); 
+        road.placeStore(40, 50); 
+        road.moveRobot(20, -5);
+        road.moveRobot(50, -10);
+        assertEquals(50, road.profit());
+    }
+
+    @Test
+    public void testVisualMethodsNoFallan() {
+        SilkRoad road = new SilkRoad(10);
+        road.makeVisible();
+        road.makeInvisible();
+        road.finish();
+        assertTrue(true); 
+    }
+    
+    private int rp(SilkRoad r, int loc){
+        try {
+            java.lang.reflect.Field robots = r.getClass().getDeclaredField("robots");
+            robots.setAccessible(true);
+            java.util.List<Robot> list = (java.util.List<Robot>)robots.get(r);
+            for(Robot rob : list) if(rob.location()==loc) return rob.profit();
+        }catch(Exception ex){}
+        return 0;
+    }
+    
+    private int st(SilkRoad r, int loc){
+        try {
+            java.lang.reflect.Field stores = r.getClass().getDeclaredField("stores");
+            stores.setAccessible(true);
+            java.util.List<Store> list = (java.util.List<Store>)stores.get(r);
+            for(Store s : list) if(s.location()==loc) return s.tenges();
+        }catch(Exception ex){}
+        return 0;
+    }
+}
