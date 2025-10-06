@@ -1,0 +1,33 @@
+import static org.junit.Assert.*;
+import org.junit.Test;
+
+public class SilkRoadCC2Test {
+
+    @Test
+    public void casoEnunciado() {
+        SilkRoad r = new SilkRoad(169); 
+        int[][] days = {
+            {1, 20},
+            {2, 15, 15},
+            {2, 40, 50},
+            {1, 50},
+            {2, 80, 20},
+            {2, 70, 30}
+        };
+        long[] out = r.simulateDaysGreedy(days);
+        assertArrayEquals(new long[]{0,10,35,50,50,60}, out);
+    }
+
+    @Test
+    public void caso2Propuesto() {
+        SilkRoad r = new SilkRoad(81);
+        int[][] days = {
+            {1, 0},      
+            {1, 10},     
+            {2, 3, 6},   
+            {2, 7, 6}    
+        };
+        long[] out = r.simulateDaysGreedy(days);
+        assertArrayEquals(new long[]{0,0,3,6}, out);
+    }
+}
